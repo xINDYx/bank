@@ -1,0 +1,25 @@
+server:
+  port: 8085
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8090/realms/bank-realm
+  r2dbc:
+    url: r2dbc:postgresql://bank-postgres:5432/exchange
+    username: ${POSTGRESQL_USER:postgres}
+    password: ${POSTGRESQL_PASSWORD:postgres}
+  datasource:
+    url: jdbc:postgresql://bank-postgres:5432/exchange
+  liquibase:
+    url: jdbc:postgresql://bank-postgres:5432/exchange
+    user: ${POSTGRESQL_USER:postgres}
+    password: ${POSTGRESQL_PASSWORD:postgres}
+    change-log: classpath:/db/changelog/db.changelog-master.yml
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-service:8761/eureka

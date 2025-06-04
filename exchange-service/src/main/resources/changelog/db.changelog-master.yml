@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: changeset/001-init-exchange-rates-schema
+      relativeToChangelogFile: true

@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: transfer-service
+
+  config:
+    import: "configserver:http://config-service:8888"
+
+cloud:
+  config:
+    name: transfer-service

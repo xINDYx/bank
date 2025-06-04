@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: blocker-service
+
+  config:
+    import: "configserver:http://config-service:8888"
+
+cloud:
+  config:
+    name: blocker-service

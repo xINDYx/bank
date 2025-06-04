@@ -1,0 +1,14 @@
+server:
+  port: 8083
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8090/realms/bank-realm
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-service:8761/eureka

@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: exchange-service
+
+  config:
+    import: "configserver:http://config-service:8888"
+
+cloud:
+  config:
+    name: exchange-service

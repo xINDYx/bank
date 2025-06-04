@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: front-ui
+
+  config:
+    import: "configserver:http://config-service:8888"
+
+cloud:
+  config:
+    name: front-ui
