@@ -1,0 +1,21 @@
+ingress:
+  enabled: true
+  host: bank.local
+
+services:
+  - name: front-ui
+    port: 8081
+  - name: accounts-service
+    port: 8085
+  - name: blocker-service
+    port: 8083
+  - name: cash-service
+    port: 8084
+  - name: exchange-service
+    port: 8082
+  - name: exchange-generator-service
+    port: 8086
+  - name: notifications-service
+    port: 8087
+  - name: transfer-service
+    port: 8088

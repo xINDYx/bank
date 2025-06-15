@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "exchange-service.fullname" . }}
+  labels:
+    {{- include "exchange-service.labels" . | nindent 4 }}
+data:
+  application.yml: |-
+    server:
+      port: {{ .Values.service.port }}
+      servlet:
+        context-path: {{ .Values.service.contextPath }}
+
+    spring:
+      security:
+        oauth2:
+          resourceserver:
+            jwt:
+              issuer-uri: {{ .Values.spring.security.oauth2.resourceserver.jwt.issuer_uri }}
+      r2dbc:
+        url: {{ .Values.spring.r2dbc.url }}
+      datasource:
+        url: {{ .Values.spring.datasource.url }}
+      liquibase:
+        url: {{ .Values.spring.liquibase.url }}
+        change-log: {{ .Values.spring.liquibase.change_log }}
+        default-schema: {{ .Values.spring.liquibase.default_schema }}
+        enabled: {{ .Values.spring.liquibase.enabled }}
+
+    eureka:
+      client:
+        service-url:
+          defaultZone: {{ .Values.eureka.client.service_url.default_zone }}
+
+    logging:
+      level:
+        root: {{ .Values.logging.level.root }}
+        ru.indiv.bank: {{ .Values.logging.level.ru_indiv_bank }}
+
+    exchange:
+      api:
+        url: {{ .Values.exchange.api.url }}
+      update:
+        interval: {{ .Values.exchange.update.interval }}
+
+    jpa:
+      hibernate:
+        ddl-auto: {{ .Values.spring.jpa.hibernate.ddl_auto }}
+      show-sql: {{ .Values.spring.jpa.show_sql }}
+      properties:
+        hibernate:
+          dialect: {{ .Values.spring.jpa.properties.hibernate.dialect }}
+          format_sql: {{ .Values.spring.jpa.properties.hibernate.format_sql }}
+    
+    profiles:
+      active: {{ .Values.spring.profiles.active }} 

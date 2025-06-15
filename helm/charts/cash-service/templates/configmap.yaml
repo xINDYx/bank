@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cash-service.fullname" . }}
+  labels:
+    {{- include "cash-service.labels" . | nindent 4 }}
+data:
+  application.yml: |-
+    server:
+      port: {{ .Values.service.port }}
+      servlet:
+        context-path: {{ .Values.service.contextPath }}
+
+    spring:
+      security:
+        oauth2:
+          resourceserver:
+            jwt:
+              issuer-uri: {{ .Values.spring.security.oauth2.resourceserver.jwt.issuer_uri }}
+      r2dbc:
+        url: {{ .Values.spring.r2dbc.url }}
+        pool:
+          enabled: {{ .Values.spring.r2dbc.pool.enabled }}
+          initial-size: {{ .Values.spring.r2dbc.pool.initial_size }}
+          max-size: {{ .Values.spring.r2dbc.pool.max_size }}
+          max-idle-time: {{ .Values.spring.r2dbc.pool.max_idle_time }}
+          max-life-time: {{ .Values.spring.r2dbc.pool.max_life_time }}
+          validation-query: {{ .Values.spring.r2dbc.pool.validation_query }}
+      datasource:
+        url: {{ .Values.spring.datasource.url }}
+      jpa:
+        show-sql: {{ .Values.spring.jpa.show_sql }}
+        hibernate:
+          ddl-auto: {{ .Values.spring.jpa.hibernate.ddl_auto }}
+        properties:
+          hibernate:
+            dialect: {{ .Values.spring.jpa.properties.hibernate.dialect }}
+            format_sql: {{ .Values.spring.jpa.properties.hibernate.format_sql }}
+      liquibase:
+        change-log: {{ .Values.spring.liquibase.change_log }}
+        default-schema: {{ .Values.spring.liquibase.default_schema }}
+        url: {{ .Values.spring.liquibase.url }}
+        enabled: {{ .Values.spring.liquibase.enabled }}
+
+    eureka:
+      client:
+        service-url:
+          defaultZone: {{ .Values.eureka.client.service_url.default_zone }}
+
+    logging:
+      level:
+        root: {{ .Values.logging.level.root }}
+        ru.indiv.bank: {{ .Values.logging.level.ru_indiv_bank }} 

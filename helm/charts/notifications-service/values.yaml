@@ -1,0 +1,94 @@
+replicaCount: 1
+
+image:
+  repository: xINDYx/notifications-service
+  pullPolicy: IfNotPresent
+  tag: ""
+
+service:
+  type: ClusterIP
+  port: 8087
+  contextPath: /api/notifications
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer_uri: http://keycloak:8090/realms/bank-realm
+  r2dbc:
+    url: r2dbc:postgresql://bank-postgres:5432/notifications
+  jpa:
+    show_sql: true
+  liquibase:
+    change_log: classpath:/db/changelog/db.changelog-master.yml
+    default_schema: public
+    url: jdbc:postgresql://bank-postgres:5432/notifications
+    enabled: true
+
+eureka:
+  client:
+    service_url:
+      default_zone: http://discovery-service:8761/eureka
+
+mail:
+  smtp:
+    host: smtp.mail.ru
+    port: 465
+
+logging:
+  level:
+    root: INFO
+    ru_indiv_bank: DEBUG
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+probes:
+  liveness:
+    path: /actuator/health/liveness
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    path: /actuator/health/readiness
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+secrets:
+  postgresql:
+    user: postgres
+    password: postgres
+  mail:
+    username: ""
+    password: ""
+
+serviceAccount:
+  create: true
+  name: ""
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: notifications.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []

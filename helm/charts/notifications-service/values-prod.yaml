@@ -1,0 +1,26 @@
+replicaCount: 3
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+
+config:
+  spring:
+    jpa:
+      show-sql: false
+  logging:
+    level:
+      root: WARN
+      ru.indiv.bank: INFO
+
+# В продакшене секреты должны быть установлены через CI/CD или внешний секретный менеджер
+secrets:
+  db:
+    username: prod_user
+    password: prod_password
+  jwt:
+    secret: prod_jwt_secret 

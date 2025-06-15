@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "notifications-service.fullname" . }}
+  labels:
+    {{- include "notifications-service.labels" . | nindent 4 }}
+data:
+  application.yml: |
+    server:
+      port: {{ .Values.service.port }}
+      servlet:
+        context-path: {{ .Values.service.contextPath }}
+
+    spring:
+      security:
+        oauth2:
+          resourceserver:
+            jwt:
+              issuer-uri: {{ .Values.spring.security.oauth2.resourceserver.jwt.issuer_uri }}
+      r2dbc:
+        url: {{ .Values.spring.r2dbc.url }}
+      jpa:
+        show-sql: {{ .Values.spring.jpa.show_sql }}
+      liquibase:
+        change-log: {{ .Values.spring.liquibase.change_log }}
+        default-schema: {{ .Values.spring.liquibase.default_schema }}
+        url: {{ .Values.spring.liquibase.url }}
+        enabled: {{ .Values.spring.liquibase.enabled }}
+
+    eureka:
+      client:
+        service-url:
+          defaultZone: {{ .Values.eureka.client.service_url.default_zone }}
+
+    mail:
+      smtp:
+        host: {{ .Values.mail.smtp.host }}
+        port: {{ .Values.mail.smtp.port }}
+
+    logging:
+      level:
+        root: {{ .Values.logging.level.root }}
+        ru_indiv_bank: {{ .Values.logging.level.ru_indiv_bank }} 

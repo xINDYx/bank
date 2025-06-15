@@ -1,0 +1,174 @@
+version: '3.8'
+
+services:
+  bank-postgres:
+    image: postgres:15
+    container_name: bank-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: accounts,exchange,notifications,cash
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+    networks:
+      - bank-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0
+    container_name: keycloak
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://bank-postgres:5432/keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+    ports:
+      - "8090:8080"
+    depends_on:
+      - bank-postgres
+    networks:
+      - bank-network
+
+  discovery-service:
+    image: xindyx/discovery-service:latest
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    networks:
+      - bank-network
+
+  api-gateway:
+    image: xindyx/api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+    depends_on:
+      - discovery-service
+    networks:
+      - bank-network
+
+  accounts-service:
+    image: xindyx/accounts-service:latest
+    container_name: accounts-service
+    ports:
+      - "8082:8082"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://bank-postgres:5432/accounts
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - discovery-service
+      - bank-postgres
+    networks:
+      - bank-network
+
+  cash-service:
+    image: xindyx/cash-service:latest
+    container_name: cash-service
+    ports:
+      - "8084:8084"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://bank-postgres:5432/cash
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - discovery-service
+      - bank-postgres
+    networks:
+      - bank-network
+
+  exchange-service:
+    image: xindyx/exchange-service:latest
+    container_name: exchange-service
+    ports:
+      - "8085:8085"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://bank-postgres:5432/exchange
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - discovery-service
+      - bank-postgres
+    networks:
+      - bank-network
+
+  exchange-generator-service:
+    image: xindyx/exchange-generator-service:latest
+    container_name: exchange-generator-service
+    ports:
+      - "8086:8086"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+    depends_on:
+      - discovery-service
+    networks:
+      - bank-network
+
+  notifications-service:
+    image: xindyx/notifications-service:latest
+    container_name: notifications-service
+    ports:
+      - "8087:8087"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://bank-postgres:5432/notifications
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - discovery-service
+      - bank-postgres
+    networks:
+      - bank-network
+
+  transfer-service:
+    image: xindyx/transfer-service:latest
+    container_name: transfer-service
+    ports:
+      - "8088:8088"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+    depends_on:
+      - discovery-service
+    networks:
+      - bank-network
+
+  blocker-service:
+    image: xindyx/blocker-service:latest
+    container_name: blocker-service
+    ports:
+      - "8083:8083"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+    depends_on:
+      - discovery-service
+    networks:
+      - bank-network
+
+  front-ui:
+    image: xindyx/front-ui:latest
+    container_name: front-ui
+    ports:
+      - "8081:8081"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+    depends_on:
+      - discovery-service
+    networks:
+      - bank-network
+
+volumes:
+  postgres_data:
+
+networks:
+  bank-network:
+    driver: bridge 

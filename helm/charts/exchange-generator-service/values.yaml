@@ -1,0 +1,138 @@
+replicaCount: 1
+
+image:
+  repository: xINDYx/exchange-generator-service
+  pullPolicy: IfNotPresent
+  tag: ""
+
+service:
+  type: ClusterIP
+  port: 8086
+  contextPath: /api/exchange-generator
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer_uri: http://keycloak:8090/realms/bank-realm
+
+eureka:
+  client:
+    service_url:
+      default_zone: http://discovery-service:8761/eureka
+
+logging:
+  level:
+    root: INFO
+    ru_indiv_bank: DEBUG
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+probes:
+  liveness:
+    path: /actuator/health/liveness
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    path: /actuator/health/readiness
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+serviceAccount:
+  create: true
+  name: ""
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: exchange-generator.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Конфигурация приложения
+config:
+  spring:
+    application:
+      name: exchange-generator-service
+    datasource:
+      url: jdbc:postgresql://main-db-postgresql:5432/exchange-generator
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: false
+    flyway:
+      enabled: true
+      baseline-on-migrate: true
+  server:
+    port: 8080
+
+# Настройки для разных окружений
+environments:
+  dev:
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    config:
+      logging:
+        level:
+          root: DEBUG
+          ru.indiv.bank: TRACE
+
+  test:
+    replicaCount: 2
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 512Mi
+    config:
+      logging:
+        level:
+          root: INFO
+          ru.indiv.bank: DEBUG
+
+  prod:
+    replicaCount: 3
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+      requests:
+        cpu: 1000m
+        memory: 1Gi
+    config:
+      logging:
+        level:
+          root: WARN
+          ru.indiv.bank: INFO

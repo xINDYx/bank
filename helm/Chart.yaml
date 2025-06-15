@@ -1,0 +1,48 @@
+apiVersion: v2
+name: bank
+description: A Helm chart for the Bank application
+version: 0.1.0
+type: application
+
+dependencies:
+  - name: keycloak
+    version: "24.3.0"
+    repository: "https://charts.bitnami.com/bitnami"
+
+  - name: postgresql
+    version: "14.2.3"
+    repository: "https://charts.bitnami.com/bitnami"
+    alias: main-db
+    condition: main-db.enabled
+
+  - name: accounts-service
+    version: 0.1.0
+    repository: "file://./charts/accounts-service"
+
+  - name: blocker-service
+    version: 0.1.0
+    repository: "file://./charts/blocker-service"
+
+  - name: cash-service
+    version: 0.1.0
+    repository: "file://./charts/cash-service"
+
+  - name: exchange-generator-service
+    version: 0.1.0
+    repository: "file://./charts/exchange-generator-service"
+
+  - name: exchange-service
+    version: 0.1.0
+    repository: "file://./charts/exchange-service"
+
+  - name: front-ui
+    version: 0.1.0
+    repository: "file://./charts/front-ui"
+
+  - name: notifications-service
+    version: 0.1.0
+    repository: "file://./charts/notifications-service"
+
+  - name: transfer-service
+    version: 0.1.0
+    repository: "file://./charts/transfer-service"

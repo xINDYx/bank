@@ -1,0 +1,94 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_REGISTRY = 'xindyx'
+        KUBE_CONFIG = credentials('kubeconfig')
+        HELM_REPO = 'https://charts.bitnami.com/bitnami'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build and Test') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    def services = [
+                        'accounts-service',
+                        'cash-service',
+                        'exchange-service',
+                        'exchange-generator-service',
+                        'notifications-service',
+                        'transfer-service',
+                        'blocker-service',
+                        'front-ui'
+                    ]
+
+                    services.each { service ->
+                        sh """
+                            docker build -t ${DOCKER_REGISTRY}/${service}:${BUILD_NUMBER} -t ${DOCKER_REGISTRY}/${service}:latest ./${service}
+                            docker push ${DOCKER_REGISTRY}/${service}:${BUILD_NUMBER}
+                            docker push ${DOCKER_REGISTRY}/${service}:latest
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    sh """
+                        helm repo add bitnami ${HELM_REPO}
+                        helm repo update
+                        
+                        # Установка зависимостей
+                        helm dependency update ./helm/charts/accounts-service
+                        helm dependency update ./helm/charts/cash-service
+                        helm dependency update ./helm/charts/exchange-service
+                        helm dependency update ./helm/charts/exchange-generator-service
+                        helm dependency update ./helm/charts/notifications-service
+                        helm dependency update ./helm/charts/transfer-service
+                        helm dependency update ./helm/charts/blocker-service
+                        helm dependency update ./helm/charts/front-ui
+                        
+                        # Обновление значений тегов в values.yaml
+                        sed -i 's|tag: .*|tag: ${BUILD_NUMBER}|g' ./helm/charts/*/values.yaml
+                        
+                        # Установка/обновление релизов
+                        helm upgrade --install accounts-service ./helm/charts/accounts-service --namespace bank --create-namespace
+                        helm upgrade --install cash-service ./helm/charts/cash-service --namespace bank
+                        helm upgrade --install exchange-service ./helm/charts/exchange-service --namespace bank
+                        helm upgrade --install exchange-generator-service ./helm/charts/exchange-generator-service --namespace bank
+                        helm upgrade --install notifications-service ./helm/charts/notifications-service --namespace bank
+                        helm upgrade --install transfer-service ./helm/charts/transfer-service --namespace bank
+                        helm upgrade --install blocker-service ./helm/charts/blocker-service --namespace bank
+                        helm upgrade --install front-ui ./helm/charts/front-ui --namespace bank
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+} 

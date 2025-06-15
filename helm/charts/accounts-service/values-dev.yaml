@@ -1,0 +1,25 @@
+replicaCount: 1
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+config:
+  spring:
+    jpa:
+      show-sql: true
+  logging:
+    level:
+      root: DEBUG
+      ru.indiv.bank: TRACE
+
+secrets:
+  db:
+    username: dev_user
+    password: dev_password
+  jwt:
+    secret: dev_jwt_secret 

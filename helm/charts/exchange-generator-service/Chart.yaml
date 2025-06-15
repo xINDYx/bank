@@ -1,0 +1,5 @@
+apiVersion: v2
+name: exchange-generator-service
+description: A Helm chart for exchange-generator microservice
+version: 0.1.0
+appVersion: "1.0.0"

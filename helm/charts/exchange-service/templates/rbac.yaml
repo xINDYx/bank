@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "exchange-service.fullname" . }}
+  labels:
+    {{- include "exchange-service.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+    resourceNames: ["{{ include "exchange-service.fullname" . }}"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "exchange-service.fullname" . }}
+  labels:
+    {{- include "exchange-service.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "exchange-service.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "exchange-service.fullname" . }}
+    namespace: {{ .Release.Namespace }} 

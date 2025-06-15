@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "notifications-service.fullname" . }}
+  labels:
+    {{- include "notifications-service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "notifications-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "notifications-service.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "notifications-service.fullname" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+          env:
+            - name: SERVER_PORT
+              value: {{ .Values.service.port | quote }}
+            - name: SERVER_SERVLET_CONTEXT_PATH
+              value: {{ .Values.service.contextPath }}
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: {{ .Values.spring.security.oauth2.resourceserver.jwt.issuer_uri }}
+            - name: SPRING_R2DBC_URL
+              value: {{ .Values.spring.r2dbc.url }}
+            - name: SPRING_R2DBC_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "notifications-service.fullname" . }}
+                  key: postgresql-user
+            - name: SPRING_R2DBC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "notifications-service.fullname" . }}
+                  key: postgresql-password
+            - name: SPRING_JPA_SHOW_SQL
+              value: {{ .Values.spring.jpa.show_sql | quote }}
+            - name: SPRING_LIQUIBASE_URL
+              value: {{ .Values.spring.liquibase.url }}
+            - name: SPRING_LIQUIBASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "notifications-service.fullname" . }}
+                  key: postgresql-user
+            - name: SPRING_LIQUIBASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "notifications-service.fullname" . }}
+                  key: postgresql-password
+            - name: SPRING_LIQUIBASE_CHANGE_LOG
+              value: {{ .Values.spring.liquibase.change_log }}
+            - name: SPRING_LIQUIBASE_DEFAULT_SCHEMA
+              value: {{ .Values.spring.liquibase.default_schema }}
+            - name: SPRING_LIQUIBASE_ENABLED
+              value: {{ .Values.spring.liquibase.enabled | quote }}
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: {{ .Values.eureka.client.service_url.default_zone }}
+            - name: MAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "notifications-service.fullname" . }}
+                  key: mail-username
+            - name: MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "notifications-service.fullname" . }}
+                  key: mail-password
+            - name: MAIL_SMTP_HOST
+              value: {{ .Values.mail.smtp.host }}
+            - name: MAIL_SMTP_PORT
+              value: {{ .Values.mail.smtp.port | quote }}
+            - name: LOGGING_LEVEL_ROOT
+              value: {{ .Values.logging.level.root }}
+            - name: LOGGING_LEVEL_RU_INDIV_BANK
+              value: {{ .Values.logging.level.ru_indiv_bank }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
