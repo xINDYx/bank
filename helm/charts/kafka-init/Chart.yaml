@@ -1,0 +1,5 @@
+apiVersion: v2
+name: kafka-init
+description: A Helm chart for Kafka topic initialization
+version: 0.1.0
+type: application 

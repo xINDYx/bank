@@ -26,6 +26,23 @@ data:
         default-schema: {{ .Values.spring.liquibase.default_schema }}
         url: {{ .Values.spring.liquibase.url }}
         enabled: {{ .Values.spring.liquibase.enabled }}
+      kafka:
+        bootstrap-servers: {{ .Values.spring.kafka.bootstrap-servers }}
+        consumer:
+          group-id: {{ .Values.spring.kafka.consumer.group-id }}
+          auto-offset-reset: {{ .Values.spring.kafka.consumer.auto-offset-reset }}
+          key-deserializer: {{ .Values.spring.kafka.consumer.key-deserializer }}
+          value-deserializer: {{ .Values.spring.kafka.consumer.value-deserializer }}
+          enable-auto-commit: {{ .Values.spring.kafka.consumer.enable-auto-commit }}
+          isolation-level: {{ .Values.spring.kafka.consumer.isolation-level }}
+        producer:
+          key-serializer: {{ .Values.spring.kafka.producer.key-serializer }}
+          value-serializer: {{ .Values.spring.kafka.producer.value-serializer }}
+          acks: {{ .Values.spring.kafka.producer.acks }}
+          retries: {{ .Values.spring.kafka.producer.retries }}
+          batch-size: {{ .Values.spring.kafka.producer.batch-size }}
+          linger-ms: {{ .Values.spring.kafka.producer.linger-ms }}
+          buffer-memory: {{ .Values.spring.kafka.producer.buffer-memory }}
 
     eureka:
       client:
@@ -36,6 +53,10 @@ data:
       smtp:
         host: {{ .Values.mail.smtp.host }}
         port: {{ .Values.mail.smtp.port }}
+
+    kafka:
+      topics:
+        notification-events: {{ .Values.kafka.topics.notification-events }}
 
     logging:
       level:

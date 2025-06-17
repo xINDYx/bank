@@ -1,0 +1,131 @@
+# Development environment configuration
+kafka:
+  enabled: true
+  replicaCount: 1  # Для dev окружения используем 1 реплику
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 4Gi
+    accessModes:
+      - ReadWriteOnce
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  zookeeper:
+    enabled: true
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 125m
+        memory: 256Mi
+  externalAccess:
+    enabled: false
+  service:
+    type: ClusterIP
+  deleteTopicEnable: true
+  autoCreateTopicsEnable: true
+  numPartitions: 1
+  defaultReplicationFactor: 1
+  offsets:
+    topic:
+      replication:
+        factor: 1
+  transaction:
+    state:
+      log:
+        replication:
+          factor: 1
+  logRetentionHours: 24
+  logRetentionBytes: -1
+  logRetentionCheckIntervalMs: 300000
+
+# Настройки для микросервисов в dev окружении
+accounts-service:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+blocker-service:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+cash-service:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+exchange-service:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+exchange-generator-service:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+front-ui:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+notifications-service:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+transfer-service:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi 

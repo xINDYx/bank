@@ -17,11 +17,29 @@ data:
           resourceserver:
             jwt:
               issuer-uri: {{ .Values.spring.security.oauth2.resourceserver.jwt.issuer_uri }}
+      # Kafka configuration
+      kafka:
+        bootstrap-servers: {{ .Values.spring.kafka.bootstrap-servers }}
+        producer:
+          key-serializer: {{ .Values.spring.kafka.producer.key-serializer }}
+          value-serializer: {{ .Values.spring.kafka.producer.value-serializer }}
+          acks: {{ .Values.spring.kafka.producer.acks }}
+          retries: {{ .Values.spring.kafka.producer.retries }}
+          batch-size: {{ .Values.spring.kafka.producer.batch-size }}
+          linger-ms: {{ .Values.spring.kafka.producer.linger-ms }}
+          buffer-memory: {{ .Values.spring.kafka.producer.buffer-memory }}
+          enable-idempotence: {{ .Values.spring.kafka.producer.enable-idempotence }}
+          max-in-flight-requests-per-connection: {{ .Values.spring.kafka.producer.max-in-flight-requests-per-connection }}
 
     eureka:
       client:
         service-url:
           defaultZone: {{ .Values.eureka.client.service_url.default_zone }}
+
+    # Kafka topics
+    kafka:
+      topics:
+        notification-events: {{ .Values.kafka.topics.notification-events }}
 
     logging:
       level:

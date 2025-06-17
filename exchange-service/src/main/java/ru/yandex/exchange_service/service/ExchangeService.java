@@ -55,4 +55,18 @@ public class ExchangeService {
 
 
     }
+
+    public Mono<Void> updateExchangeRateFromEvent(ExchangeRateResponseDTO event) {
+        // Обновляем или сохраняем курс валюты по событию
+        return exchangeRepository.findByCurrency(event.getCurrency())
+                .defaultIfEmpty(new ExchangeRate())
+                .flatMap(existing -> {
+                    existing.setCurrency(event.getCurrency());
+                    existing.setRate(event.getRate());
+                    existing.setCreatedAt(event.getCreatedAt());
+                    existing.setModifiedAt(event.getModifiedAt());
+                    return exchangeRepository.save(existing);
+                })
+                .then();
+    }
 }

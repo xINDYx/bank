@@ -5,6 +5,25 @@ spring:
   config:
     import: optional:configtree:/etc/config/
 
+  # Kafka configuration
+  kafka:
+    bootstrap-servers: bank-kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+      batch-size: 16384
+      linger-ms: 1
+      buffer-memory: 33554432
+      enable-idempotence: true
+      max-in-flight-requests-per-connection: 5
+
 cloud:
   config:
     name: cash-service
+
+# Kafka topics
+kafka:
+  topics:
+    notification-events: notification-events

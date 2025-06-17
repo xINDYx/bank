@@ -2,6 +2,57 @@ ingress:
   enabled: true
   host: bank.local
 
+# Kafka configuration
+kafka:
+  enabled: true
+  replicaCount: 2
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 8Gi
+    accessModes:
+      - ReadWriteOnce
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  zookeeper:
+    enabled: true
+    persistence:
+      enabled: true
+      storageClass: ""
+      size: 4Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+  externalAccess:
+    enabled: false
+  service:
+    type: ClusterIP
+  deleteTopicEnable: true
+  autoCreateTopicsEnable: true
+  numPartitions: 3
+  defaultReplicationFactor: 2
+  offsets:
+    topic:
+      replication:
+        factor: 2
+  transaction:
+    state:
+      log:
+        replication:
+          factor: 2
+  logRetentionHours: 168
+  logRetentionBytes: -1
+  logRetentionCheckIntervalMs: 300000
+
 services:
   - name: front-ui
     port: 8081

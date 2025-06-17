@@ -5,6 +5,23 @@ spring:
   config:
     import: optional:configtree:/etc/config/
 
+  kafka:
+    bootstrap-servers: bank-kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: 0
+      retries: 0
+      enable-idempotence: false
+      max-in-flight-requests-per-connection: 1
+      batch-size: 16384
+      linger-ms: 1
+      buffer-memory: 33554432
+
 cloud:
   config:
     name: exchange-generator-service
+
+kafka:
+  topics:
+    exchange-rate-events: exchange-rate-events

@@ -1,0 +1,52 @@
+# Kafka initialization job configuration
+image:
+  repository: bitnami/kafka
+  tag: "3.6.1"
+  pullPolicy: IfNotPresent
+
+kafka:
+  bootstrapServers: bank-kafka:9092
+
+topics:
+  - name: account-events
+    partitions: 3
+    replicationFactor: 2
+    config:
+      retention.ms: 604800000  # 7 days
+      cleanup.policy: delete
+  - name: transaction-events
+    partitions: 3
+    replicationFactor: 2
+    config:
+      retention.ms: 604800000  # 7 days
+      cleanup.policy: delete
+  - name: exchange-rate-events
+    partitions: 1
+    replicationFactor: 2
+    config:
+      retention.ms: 604800000  # 7 days
+      cleanup.policy: delete
+  - name: notification-events
+    partitions: 3
+    replicationFactor: 2
+    config:
+      retention.ms: 604800000  # 7 days
+      cleanup.policy: delete
+  - name: blocker-events
+    partitions: 3
+    replicationFactor: 2
+    config:
+      retention.ms: 604800000  # 7 days
+      cleanup.policy: delete
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+serviceAccount:
+  create: true
+  name: "" 

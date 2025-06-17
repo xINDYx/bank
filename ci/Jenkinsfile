@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'test', 'prod'], description: 'Select the deployment environment')
+    }
+
     environment {
         DOCKER_REGISTRY = 'xindyx'
         KUBE_CONFIG = credentials('kubeconfig')
@@ -49,31 +53,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                        helm repo add bitnami ${HELM_REPO}
-                        helm repo update
-                        
-                        # Установка зависимостей
-                        helm dependency update ./helm/charts/accounts-service
-                        helm dependency update ./helm/charts/cash-service
-                        helm dependency update ./helm/charts/exchange-service
-                        helm dependency update ./helm/charts/exchange-generator-service
-                        helm dependency update ./helm/charts/notifications-service
-                        helm dependency update ./helm/charts/transfer-service
-                        helm dependency update ./helm/charts/blocker-service
-                        helm dependency update ./helm/charts/front-ui
-                        
-                        # Обновление значений тегов в values.yaml
-                        sed -i 's|tag: .*|tag: ${BUILD_NUMBER}|g' ./helm/charts/*/values.yaml
-                        
-                        # Установка/обновление релизов
-                        helm upgrade --install accounts-service ./helm/charts/accounts-service --namespace bank --create-namespace
-                        helm upgrade --install cash-service ./helm/charts/cash-service --namespace bank
-                        helm upgrade --install exchange-service ./helm/charts/exchange-service --namespace bank
-                        helm upgrade --install exchange-generator-service ./helm/charts/exchange-generator-service --namespace bank
-                        helm upgrade --install notifications-service ./helm/charts/notifications-service --namespace bank
-                        helm upgrade --install transfer-service ./helm/charts/transfer-service --namespace bank
-                        helm upgrade --install blocker-service ./helm/charts/blocker-service --namespace bank
-                        helm upgrade --install front-ui ./helm/charts/front-ui --namespace bank
+                        chmod +x scripts/deploy-kafka.sh
+                        ./scripts/deploy-kafka.sh ${ENVIRONMENT} ${BUILD_NUMBER}
                     """
                 }
             }

@@ -5,6 +5,21 @@ spring:
   config:
     import: optional:configtree:/etc/config/
 
+  kafka:
+    bootstrap-servers: bank-kafka:9092
+    consumer:
+      group-id: exchange-service-group
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: true
+      max-poll-records: 1
+      isolation-level: read-committed
+
 cloud:
   config:
     name: exchange-service
+
+kafka:
+  topics:
+    exchange-rate-events: exchange-rate-events

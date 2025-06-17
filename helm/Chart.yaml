@@ -15,6 +15,16 @@ dependencies:
     alias: main-db
     condition: main-db.enabled
 
+  - name: kafka
+    version: "27.2.0"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: kafka.enabled
+
+  - name: kafka-init
+    version: 0.1.0
+    repository: "file://./charts/kafka-init"
+    condition: kafka.enabled
+
   - name: accounts-service
     version: 0.1.0
     repository: "file://./charts/accounts-service"

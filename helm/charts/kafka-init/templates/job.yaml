@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "kafka-init.fullname" . }}
+  labels:
+    {{- include "kafka-init.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "kafka-init.selectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: kafka-init
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - /bin/bash
+        - -c
+        - |
+          # Ждем, пока Kafka будет готова
+          echo "Waiting for Kafka to be ready..."
+          until kafka-topics.sh --bootstrap-server {{ .Values.kafka.bootstrapServers }} --list; do
+            echo "Kafka not ready yet, waiting..."
+            sleep 10
+          done
+          
+          echo "Kafka is ready, creating topics..."
+          
+          {{- range .Values.topics }}
+          echo "Creating topic {{ .name }}..."
+          kafka-topics.sh --bootstrap-server {{ $.Values.kafka.bootstrapServers }} \
+            --create \
+            --topic {{ .name }} \
+            --partitions {{ .partitions }} \
+            --replication-factor {{ .replicationFactor }} \
+            --if-not-exists \
+            {{- range $key, $value := .config }}
+            --config {{ $key }}={{ $value }} \
+            {{- end }}
+          
+          if [ $? -eq 0 ]; then
+            echo "Topic {{ .name }} created successfully"
+          else
+            echo "Failed to create topic {{ .name }}"
+            exit 1
+          fi
+          {{- end }}
+          
+          echo "All topics created successfully!"
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      serviceAccountName: {{ include "kafka-init.serviceAccountName" . }} 
