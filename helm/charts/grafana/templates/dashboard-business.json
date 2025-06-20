@@ -1,0 +1,161 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "iteration": 162524,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(increase(successful_login_total[5m])) by (login)",
+          "interval": "",
+          "legendFormat": "Успешные логины: {{login}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(increase(failed_login_total[5m])) by (login)",
+          "interval": "",
+          "legendFormat": "Неуспешные логины: {{login}}",
+          "refId": "B"
+        }
+      ],
+      "title": "Логины пользователей",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(increase(failed_transfer_total[5m])) by (from_login, to_login)",
+          "interval": "",
+          "legendFormat": "Неуспешные переводы: {{from_login}} → {{to_login}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Неуспешные попытки перевода",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(increase(blocked_operations_total[5m])) by (login, from_account, to_account)",
+          "interval": "",
+          "legendFormat": "Блокировки: {{login}} ({{from_account}} → {{to_account}})",
+          "refId": "A"
+        }
+      ],
+      "title": "Блокировки подозрительных операций",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 4,
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(increase(notification_failed_total[5m])) by (login)",
+          "interval": "",
+          "legendFormat": "Неотправленные уведомления: {{login}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Неотправленные уведомления",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 5,
+      "options": {},
+      "targets": [
+        {
+          "expr": "max_over_time(exchange_rate_update_absent[5m])",
+          "interval": "",
+          "legendFormat": "Отсутствие обновления курсов валют",
+          "refId": "A"
+        }
+      ],
+      "title": "Отсутствие обновления курсов валют",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": [
+    "business"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Бизнес-метрики",
+  "uid": "business-metrics",
+  "version": 1
+} 

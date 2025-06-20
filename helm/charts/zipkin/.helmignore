@@ -1,0 +1,6 @@
+# Patterns to ignore when packaging and deploying this chart
+*.tgz
+*.bak
+*.tmp
+*.swp
+.DS_Store 

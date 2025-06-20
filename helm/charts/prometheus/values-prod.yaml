@@ -1,0 +1,9 @@
+replicaCount: 1
+image:
+  repository: prom/prometheus
+  tag: 2.51.0
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 9090
+resources: {} 

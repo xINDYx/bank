@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "logstash.fullname" . }}-pipeline
+  labels:
+    app: {{ include "logstash.name" . }}
+    release: {{ .Release.Name }}
+data:
+  logstash.conf: |
+    input {
+      kafka {
+        bootstrap_servers => "bank-kafka:9092"
+        topics => ["logs"]
+        group_id => "logstash-group"
+        codec => "json"
+      }
+    }
+    filter {
+      # Пример фильтрации и маскирования
+      if [password] {
+        mutate { replace => { "password" => "***" } }
+      }
+      if [account_number] {
+        mutate { gsub => [ "account_number", ".*", "****" ] }
+      }
+    }
+    output {
+      elasticsearch {
+        hosts => ["http://elasticsearch:9200"]
+        index => "bank-logs-%{+YYYY.MM.dd}"
+        user => ""
+        password => ""
+      }
+      stdout { codec => rubydebug }
+    } 

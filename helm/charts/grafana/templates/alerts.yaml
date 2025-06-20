@@ -1,0 +1,36 @@
+apiVersion: 1
+contactPoints:
+  - name: default
+    receivers:
+      - uid: email
+        type: email
+        settings:
+          addresses: "admin@example.com"
+alertRules:
+  - uid: high-5xx-errors
+    title: High 5xx Errors
+    condition: B
+    data:
+      - refId: A
+        queryType: Prometheus
+        relativeTimeRange:
+          from: 600
+          to: 0
+        datasourceUid: prometheus
+        model:
+          expr: sum(rate(http_server_requests_seconds_count{outcome="SERVER_ERROR"}[1m])) by (service)
+          interval: ""
+          legendFormat: "{{service}}"
+          refId: A
+      - refId: B
+        queryType: Expression
+        expression: A > 1
+        type: threshold
+    noDataState: NoData
+    execErrState: Error
+    for: 2m
+    annotations:
+      summary: "Высокий уровень 5xx ошибок на сервисе"
+      description: "Больше 1 ошибки в секунду (5xx) на сервисе в течение 2 минут."
+    labels:
+      severity: warning 

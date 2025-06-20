@@ -1,0 +1,6 @@
+apiVersion: v2
+name: kibana
+description: Minimal Kibana deployment for log visualization
+version: 0.1.0
+appVersion: "8.13.4"
+type: application 

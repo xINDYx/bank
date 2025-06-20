@@ -25,3 +25,25 @@ cloud:
 kafka:
   topics:
     exchange-rate-events: exchange-rate-events
+
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+    propagation:
+      type: w3c
+    otlp:
+      enabled: false
+    zipkin:
+      enabled: true
+    endpoints:
+      web:
+        exposure:
+          include: health,info,prometheus
+  metrics:
+    enable:
+      all: true
+  endpoint:
+    prometheus:
+      enabled: true

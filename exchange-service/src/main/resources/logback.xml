@@ -1,0 +1,24 @@
+<configuration>
+    <appender name="KAFKA" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <topic>logs</topic>
+        <producerConfig>bootstrap.servers=bank-kafka:9092</producerConfig>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <fieldNames>
+                <timestamp>timestamp</timestamp>
+                <level>level</level>
+                <thread>thread</thread>
+                <logger>logger</logger>
+                <message>message</message>
+                <context>context</context>
+            </fieldNames>
+            <customFields>{"service":"exchange-service"}</customFields>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="KAFKA"/>
+    </root>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.apache.kafka" level="WARN"/>
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="ROOT" level="INFO"/>
+</configuration> 

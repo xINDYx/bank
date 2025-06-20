@@ -32,3 +32,26 @@ cloud:
 kafka:
   topics:
     notification-events: notification-events
+
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+    propagation:
+      type: w3c
+    otlp:
+      enabled: false
+    zipkin:
+      enabled: true
+      endpoint: http://zipkin:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    enable:
+      all: true
+  endpoint:
+    prometheus:
+      enabled: true
